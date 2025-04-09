@@ -54,8 +54,9 @@ func getRequestTarget(request string) string {
 }
 
 func getUserAgent(request string) string {
-	fmt.Println(request)
+	fmt.Println("Req: " + request)
 	userAgentLine := strings.Split(request, "\r\n")[3]
+	fmt.Println("UALine: " + userAgentLine)
 	userAgentValue := strings.Split(userAgentLine, " ")[1]
 	return userAgentValue
 }
