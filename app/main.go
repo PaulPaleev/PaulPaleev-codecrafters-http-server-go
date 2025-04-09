@@ -71,6 +71,7 @@ func getFilename(request string) string {
 	fileString := strings.Split(request, "\r\n")
 	fmt.Println("STRINGS")
 	fmt.Println(fileString)
+	fmt.Println("STRINGS")
 	return "string"
 }
 
