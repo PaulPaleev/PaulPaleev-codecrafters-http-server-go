@@ -26,14 +26,10 @@ func main() {
 	req := make([]byte, 1024)
 	conn.Read(req)
 
-	// if !strings.HasPrefix(string(req), "GET / HTTP/1.1") {
-	// 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
-	// 	return
-	// }
 	target := getRequestTarget(string(req))
 
 	if target == "/" {
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+		go conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
