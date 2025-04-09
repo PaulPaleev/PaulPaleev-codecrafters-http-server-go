@@ -44,7 +44,6 @@ func handleRequest(conn net.Conn) {
 	} else if strings.HasPrefix(target, "/echo") {
 		response := "HTTP/1.1 200 OK\r\n"
 		schemes, err := getEncodingsList(strReq)
-		fmt.Println("SCHEMEA: ", schemes)
 		if err == nil {
 			response += "Content-Encoding:" + schemes[0] + "\r\n"
 		}
@@ -102,11 +101,11 @@ func getEncodingsList(request string) ([]string, error) {
 	var schemesToReturn []string
 	var err error
 	schemesLine := strings.Split(request, "\r\n")[2]
-	fmt.Println("FSHEM LINE", schemesLine)
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
 		schemesToReturn, err = filterValidSchemes(schemes)
 	}
+	fmt.Println(err)
 	return schemesToReturn, err
 }
 
