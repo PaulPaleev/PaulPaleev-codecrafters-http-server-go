@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
+	"strconv"
 )
 
 func main() {
@@ -25,9 +25,14 @@ func main() {
 
 	req := make([]byte, 1024)
 	conn.Read(req)
-	if !strings.HasPrefix(string(req), "GET / HTTP/1.1") {
-		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
-		return
-	}
-	conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+
+	// if !strings.HasPrefix(string(req), "GET / HTTP/1.1") {
+	// 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	// 	return
+	// }
+
+	var number int = 3
+	var body string = "abc"
+	var finalStringToConvert string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + strconv.Itoa(number) + "\r\n" + body
+	conn.Write([]byte(finalStringToConvert))
 }
