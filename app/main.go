@@ -47,9 +47,8 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
 		filename := getFilename(strReq)
+		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
 		dir := os.Args[2]
-		fmt.Println(os.Args)
-		fmt.Println(dir)
 		body, err := os.ReadFile(dir + filename)
 		if err != nil {
 			sendNotFound(conn)
