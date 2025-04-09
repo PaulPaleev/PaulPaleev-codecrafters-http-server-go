@@ -82,10 +82,8 @@ func sendNotFound(conn net.Conn) {
 
 func getEncodingsList(request string) []string {
 	var validSchemes []string
-	schemesLine := strings.Split(request, " ")[4]
-	//schemes := strings.Split(schemesLine, " ")[1]
+	schemesLine := strings.Split(request, " ")[3]
 	fmt.Println(schemesLine)
-	//fmt.Println(schemes)
 	return validSchemes
 }
 
