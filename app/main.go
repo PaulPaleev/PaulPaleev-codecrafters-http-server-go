@@ -44,6 +44,7 @@ func handleRequest(conn net.Conn) {
 	} else if strings.HasPrefix(target, "/echo") {
 		response := "HTTP/1.1 200 OK\r\n"
 		schemes, err := getEncodingsList(strReq)
+		fmt.Println("SCHEMEA: ", schemes)
 		if err == nil {
 			response += "Content-Encoding:" + schemes[0] + "\r\n"
 		}
