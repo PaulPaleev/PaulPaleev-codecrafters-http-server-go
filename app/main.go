@@ -8,9 +8,6 @@ import (
 )
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
-
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
 		fmt.Println("Failed to bind to port 4221")
@@ -74,9 +71,9 @@ func getFilename(request string) string {
 }
 
 func getRequestTarget(request string) string {
-	fmt.Println(request)
+	fmt.Println("req: " + request)
 	requestLine := strings.Split(request, "\r\n")[0]
-	fmt.Println(requestLine)
+	fmt.Println("RL: " + requestLine)
 	target := strings.Split(requestLine, " ")[1]
 	return target
 }
