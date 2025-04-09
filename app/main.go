@@ -38,7 +38,6 @@ func handleRequest(conn net.Conn) {
 	fmt.Println("1. " + strReq)
 
 	target := getRequestTarget(strReq)
-	fmt.Println("2. " + target)
 
 	if target == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
@@ -52,13 +51,11 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
 		filename := getFilename(strReq)
-		fmt.Println("3.")
 		body, err := os.ReadFile(filename)
 		if err != nil {
-			fmt.Println("4.")
 			sendNotFound(conn)
+			return
 		}
-		fmt.Println("5.")
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else {
@@ -72,13 +69,14 @@ func sendNotFound(conn net.Conn) {
 
 func getFilename(request string) string {
 	fileString := strings.Split(request, "\r\n")[0]
-	fileName := strings.Split(fileString, "/")
-	fmt.Println(fileName)
-	return "fileName"
+	fileName := strings.Split(fileString, "/")[1]
+	return fileName
 }
 
 func getRequestTarget(request string) string {
+	fmt.Println(request)
 	requestLine := strings.Split(request, "\r\n")[0]
+	fmt.Println(requestLine)
 	target := strings.Split(requestLine, " ")[1]
 	return target
 }
