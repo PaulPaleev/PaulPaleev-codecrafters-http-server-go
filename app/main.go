@@ -47,9 +47,31 @@ func handleRequest(conn net.Conn) {
 		body := getUserAgent(string(req))
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
+	} else if strings.HasPrefix(target, "/files") {
+		filename := getFilename(string(req))
+
+		fmt.Print(filename)
+
+		body, err := os.ReadFile(filename)
+		if err != nil {
+			sendNotFound(conn)
+		}
+		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+		conn.Write([]byte(finalStringToConvert))
 	} else {
-		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+		sendNotFound(conn)
 	}
+}
+
+func sendNotFound(conn net.Conn) {
+	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+}
+
+func getFilename(request string) string {
+	fileString := strings.Split(request, "\r\n")
+	fmt.Println("STRINGS")
+	fmt.Println(fileString)
+	return "string"
 }
 
 func getRequestTarget(request string) string {
