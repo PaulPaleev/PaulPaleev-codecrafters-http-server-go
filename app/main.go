@@ -30,7 +30,8 @@ func main() {
 	// 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	// 	return
 	// }
-	body := string(req)[10:]
+	reqStr := string(req)
+	body := reqStr[10 : len(reqStr)-6]
 	number := len(body)
 	fmt.Println("hellooooooooooooo ", body, number)
 
