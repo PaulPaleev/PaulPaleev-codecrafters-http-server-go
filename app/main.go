@@ -59,14 +59,15 @@ func handleRequest(conn net.Conn) {
 			conn.Write([]byte(finalStringToConvert))
 		} else if getMethodType(strReq) == "POST" {
 			body := getBody(strReq)
-			file, _ := os.Create(dir + filename)
-			file.WriteString(body)
+			// file, _ := os.Create(dir + filename)
+			// file.WriteString(body)
+
+			err := os.WriteFile(dir+filename, []byte(body), 0666)
+			if err != nil {
+				sendNotFound(conn)
+				return
+			}
 			conn.Write([]byte("HTTP/1.1 201 Created\r\n\r\n"))
-			// err := os.WriteFile(dir+filename, []byte(body), 0666)
-			// if err != nil {
-			// 	sendNotFound(conn)
-			// 	return
-			// }
 		}
 	} else {
 		sendNotFound(conn)
