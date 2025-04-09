@@ -87,10 +87,10 @@ func sendNotFound(conn net.Conn) {
 func getEncodingsList(request string) ([]string, error) {
 	var schemesToReturn []string
 	schemesLine := strings.Split(request, "\r\n")[2]
-	fmt.Println("SCHE LINE", schemesLine)
+	fmt.Println("SCHE LINE ", schemesLine)
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
-		fmt.Println("SCHEMES", schemes)
+		fmt.Println("SCHEMES ", schemes)
 		for _, v := range schemes {
 			if slices.Contains(supportedEncodingSchemes, v) {
 				schemesToReturn = append(schemesToReturn, v)
@@ -99,6 +99,7 @@ func getEncodingsList(request string) ([]string, error) {
 		if len(schemesToReturn) > 0 {
 			return schemesToReturn, nil
 		}
+		fmt.Println("TO RETURN ", schemesToReturn)
 	}
 	return schemesToReturn, errors.New("empty scheme slice, no encoding provided")
 }
