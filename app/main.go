@@ -30,9 +30,9 @@ func main() {
 	// 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	// 	return
 	// }
-	body := string(req)[10 : len(string(req))-8]
+	body := string(req)[10:]
 	number := len(body)
-	fmt.Println(body, number)
+	fmt.Println("hellooooooooooooo ", body, number)
 
 	var finalStringToConvert string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + strconv.Itoa(number) + "\r\n" + body
 	conn.Write([]byte(finalStringToConvert))
