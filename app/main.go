@@ -38,6 +38,10 @@ func main() {
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
+	} else if strings.HasPrefix(target, "/user-agent") {
+		body := getUserAgent(string(req))
+		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+		conn.Write([]byte(finalStringToConvert))
 	} else {
 		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	}
@@ -47,4 +51,10 @@ func getRequestTarget(request string) string {
 	requestLine := strings.Split(request, "\r\n")[0]
 	target := strings.Split(requestLine, " ")[1]
 	return target
+}
+
+func getUserAgent(request string) string {
+	userAgentLine := strings.Split(request, "\r\n")[3]
+	userAgentValue := strings.Split(userAgentLine, " ")[1]
+	return userAgentValue
 }
