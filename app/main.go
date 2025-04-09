@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -41,9 +42,9 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
 		response := "HTTP/1.1 200 OK\r\n"
-		schemes := getEncodingsList(strReq)
-		if schemes[0] == "gzip" {
-			response += "Content-Encoding: gzip\r\n"
+		schemes, err := getEncodingsList(strReq)
+		if err == nil {
+			response += "Content-Encoding:" + schemes[0] + "\r\n"
 		}
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf(response+"Content-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
@@ -83,13 +84,13 @@ func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
-func getEncodingsList(request string) []string {
-	var validSchemes []string
+func getEncodingsList(request string) ([]string, error) {
 	schemesLine := strings.Split(request, "\r\n")[2]
 	if len(schemesLine) > 0 {
-		validSchemes = strings.Fields(schemesLine[16:])
+		validSchemes := strings.Fields(schemesLine[16:])
+		return validSchemes, nil
 	}
-	return validSchemes
+	return nil, errors.New("empty scheme slice, no encoding provided")
 }
 
 func getMethodType(request string) string {
