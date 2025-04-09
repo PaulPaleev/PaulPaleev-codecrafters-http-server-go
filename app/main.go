@@ -72,8 +72,9 @@ func sendNotFound(conn net.Conn) {
 
 func getFilename(request string) string {
 	fileString := strings.Split(request, "\r\n")[0]
-	fileName := strings.Split(fileString, "/")[2]
-	return fileName
+	fileName := strings.Split(fileString, "/")
+	fmt.Println(fileName)
+	return "fileName"
 }
 
 func getRequestTarget(request string) string {
