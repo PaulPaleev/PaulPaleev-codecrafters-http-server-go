@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strconv"
+	"strings"
 )
 
 func main() {
@@ -30,11 +30,22 @@ func main() {
 	// 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	// 	return
 	// }
-	reqStr := string(req)
-	body := reqStr[10 : len(reqStr)-2]
-	number := len(body)
-	fmt.Println("hellooooooooooooo ", body, number)
+	target := getRequestTarget(string(req))
 
-	var finalStringToConvert string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + strconv.Itoa(number) + "\r\n" + body
-	conn.Write([]byte(finalStringToConvert))
+	if target == "/" {
+		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	} else if strings.HasPrefix(target, "/echo") {
+		fmt.Printf("%q\n", strings.Split(target, "/"))
+		body := strings.Split(target, "/")[2]
+		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n%s", len(body), body)
+		conn.Write([]byte(finalStringToConvert))
+	} else {
+		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	}
+}
+
+func getRequestTarget(request string) string {
+	requestLine := strings.Split(request, "\r\n")[0]
+	target := strings.Split(requestLine, " ")[1]
+	return target
 }
