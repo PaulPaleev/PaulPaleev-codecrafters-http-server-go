@@ -29,6 +29,8 @@ func main() {
 func handleRequest(conn net.Conn) {
 	defer conn.Close()
 
+	supportedEncodingSchemes := []string{"gzip"}
+
 	req := make([]byte, 1024)
 	conn.Read(req)
 	strReq := string(req)
@@ -38,6 +40,9 @@ func handleRequest(conn net.Conn) {
 	if target == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
+
+		fmt.Println(getEncodingsList(strReq))
+
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
@@ -73,6 +78,13 @@ func handleRequest(conn net.Conn) {
 
 func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+}
+
+func getEncodingsList(request string) []string {
+	var validSchemes []string
+	schemesLine := strings.Split(request, " ")
+	fmt.Println(schemesLine)
+	return validSchemes
 }
 
 func getMethodType(request string) string {
