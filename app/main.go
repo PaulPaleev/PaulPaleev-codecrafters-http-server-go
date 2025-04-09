@@ -27,7 +27,6 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	defer conn.Close()
 	req := make([]byte, 1024)
 	conn.Read(req)
 
