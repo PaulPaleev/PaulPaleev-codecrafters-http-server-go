@@ -100,5 +100,5 @@ func getUserAgent(request string) string {
 }
 
 func getBody(request string) string {
-
+	return ""
 }
