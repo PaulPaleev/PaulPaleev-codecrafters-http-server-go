@@ -102,6 +102,7 @@ func getEncodingsList(request string) ([]string, error) {
 	var schemesToReturn []string
 	var err error
 	schemesLine := strings.Split(request, "\r\n")[2]
+	fmt.Println("FSHEM LINE", schemesLine)
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
 		schemesToReturn, err = filterValidSchemes(schemes)
