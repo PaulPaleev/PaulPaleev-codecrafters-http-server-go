@@ -58,7 +58,7 @@ func handleRequest(conn net.Conn) {
 			finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 			conn.Write([]byte(finalStringToConvert))
 		} else if getMethodType(strReq) == "POST" {
-			body := getUserAgent(strReq)
+			body := getBody(strReq)
 			fmt.Println("BODY: " + body)
 			err := os.WriteFile(dir+filename, []byte(body), 0666)
 			if err != nil {
@@ -100,5 +100,7 @@ func getUserAgent(request string) string {
 }
 
 func getBody(request string) string {
+	bodyLine := strings.Split(request, "\r\n")[7]
+	fmt.Println(bodyLine)
 	return ""
 }
