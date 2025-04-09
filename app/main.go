@@ -42,20 +42,30 @@ func handleRequest(conn net.Conn) {
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/user-agent") {
-		body := getUserAgent(string(req))
+		body := getUserAgent(strReq)
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
 		filename := getFilename(strReq)
-		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
 		dir := os.Args[2]
-		body, err := os.ReadFile(dir + filename)
-		if err != nil {
-			sendNotFound(conn)
-			return
+		if getMethodType(strReq) == "GET" {
+			// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
+			body, err := os.ReadFile(dir + filename)
+			if err != nil {
+				sendNotFound(conn)
+				return
+			}
+			finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+			conn.Write([]byte(finalStringToConvert))
+		} else if getMethodType(strReq) == "POST" {
+			body := getUserAgent(strReq)
+			fmt.Println("BODY: " + body)
+			err := os.WriteFile(dir+filename, []byte(body), 0666)
+			if err != nil {
+				sendNotFound(conn)
+				return
+			}
 		}
-		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
-		conn.Write([]byte(finalStringToConvert))
 	} else {
 		sendNotFound(conn)
 	}
@@ -63,6 +73,12 @@ func handleRequest(conn net.Conn) {
 
 func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+}
+
+func getMethodType(request string) string {
+	methodLine := strings.Split(request, "\r\n")[0]
+	methodType := strings.Split(methodLine, " ")[0]
+	return methodType
 }
 
 func getFilename(request string) string {
@@ -81,4 +97,8 @@ func getUserAgent(request string) string {
 	userAgentLine := strings.Split(request, "\r\n")[2]
 	userAgentValue := strings.Split(userAgentLine, " ")[1]
 	return userAgentValue
+}
+
+func getBody(request string) string {
+
 }
