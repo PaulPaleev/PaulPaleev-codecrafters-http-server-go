@@ -50,7 +50,7 @@ func handleRequest(conn net.Conn) {
 		body := getUserAgent(string(req))
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
-	} else if strings.HasPrefix(target, "/files") {
+	} else if strings.HasPrefix(target, "/files/") {
 		filename := getFilename(strReq)
 		fmt.Println("3.")
 		body, err := os.ReadFile(filename)
@@ -71,8 +71,8 @@ func sendNotFound(conn net.Conn) {
 }
 
 func getFilename(request string) string {
-	//fileString := strings.Split(request, "\r\n")
-	return "end"
+	fileString := strings.Split(request, "/")[2]
+	return fileString
 }
 
 func getRequestTarget(request string) string {
