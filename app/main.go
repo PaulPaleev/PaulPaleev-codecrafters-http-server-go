@@ -90,7 +90,7 @@ func getEncodingsList(request string) ([]string, error) {
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
 		for _, v := range schemes {
-			fmt.Println(v)
+			v = strings.TrimRight(v, ",")
 			if slices.Contains(supportedEncodingSchemes, v) {
 				schemesToReturn = append(schemesToReturn, v)
 			}
