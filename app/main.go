@@ -31,7 +31,7 @@ func main() {
 	// 	return
 	// }
 	reqStr := string(req)
-	body := reqStr[10 : len(reqStr)-6]
+	body := reqStr[10 : len(reqStr)-2]
 	number := len(body)
 	fmt.Println("hellooooooooooooo ", body, number)
 
