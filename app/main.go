@@ -34,6 +34,7 @@ func handleRequest(conn net.Conn) {
 
 	req := make([]byte, 1024)
 	conn.Read(req)
+	fmt.Println(string(req))
 
 	target := getRequestTarget(string(req))
 
@@ -49,8 +50,6 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files") {
 		filename := getFilename(string(req))
-
-		fmt.Print(filename)
 
 		body, err := os.ReadFile(filename)
 		if err != nil {
@@ -70,7 +69,6 @@ func sendNotFound(conn net.Conn) {
 func getFilename(request string) string {
 	//fileString := strings.Split(request, "\r\n")
 	fmt.Println(request)
-	fmt.Println("STRINGS")
 	return "string"
 }
 
