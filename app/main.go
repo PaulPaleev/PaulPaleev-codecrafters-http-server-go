@@ -92,6 +92,7 @@ func filterValidSchemes(schemes []string) []string {
 			validSchemes = append(validSchemes, v)
 		}
 	}
+	fmt.Println("eaasfa: ", validSchemes)
 	return validSchemes
 }
 
