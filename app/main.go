@@ -51,8 +51,7 @@ func handleRequest(conn net.Conn) {
 		if err == nil {
 			response += "Content-Encoding:" + schemes[0] + "\r\n"
 			compressedBody := getCompressedBody(body)
-			fmt.Println(compressedBody)
-			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", 23, compressedBody)
+			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(compressedBody), compressedBody)
 		} else {
 			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
 		}
@@ -91,12 +90,13 @@ func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
-func getCompressedBody(body string) *gzip.Writer {
+func getCompressedBody(body string) string {
 	var b bytes.Buffer
 	w := gzip.NewWriter(&b)
 	w.Write([]byte(body))
 	w.Close()
-	return w
+	compressedBody := b.String()
+	return compressedBody
 }
 
 func getEncodingsList(request string) ([]string, error) {
