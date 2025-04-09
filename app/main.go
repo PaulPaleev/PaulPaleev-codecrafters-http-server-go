@@ -104,8 +104,8 @@ func getUserAgent(request string) string {
 
 func getBody(request string) string {
 	bodyLine := strings.Split(request, "\r\n")
-	for _, v := range bodyLine {
-		fmt.Println(v)
+	for i, v := range bodyLine {
+		fmt.Printf("Index: %v, value: %v\n", i, v)
 	}
 	return "bodyLine"
 }
