@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"slices"
 	"strings"
 )
+
+var supportedEncodingSchemes = []string{"gzip"}
 
 func main() {
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
@@ -30,8 +33,6 @@ func main() {
 func handleRequest(conn net.Conn) {
 	defer conn.Close()
 
-	//supportedEncodingSchemes := []string{"gzip"}
-
 	req := make([]byte, 1024)
 	conn.Read(req)
 	strReq := string(req)
@@ -44,11 +45,11 @@ func handleRequest(conn net.Conn) {
 		response := "HTTP/1.1 200 OK\r\n"
 		schemes, err := getEncodingsList(strReq)
 		if err == nil {
-			response += "Content-Encoding:" + schemes[0] + "\r\n"
+			validSchemes := filterValidSchemes(schemes)
+			response += "Content-Encoding:" + validSchemes[0] + "\r\n"
 		}
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf(response+"Content-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
-		//finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/user-agent") {
 		body := getUserAgent(strReq)
@@ -84,11 +85,21 @@ func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
+func filterValidSchemes(schemes []string) []string {
+	var validSchemes []string
+	for _, v := range schemes {
+		if slices.Contains(supportedEncodingSchemes, v) {
+			validSchemes = append(validSchemes, v)
+		}
+	}
+	return validSchemes
+}
+
 func getEncodingsList(request string) ([]string, error) {
 	schemesLine := strings.Split(request, "\r\n")[2]
 	if len(schemesLine) > 0 {
-		validSchemes := strings.Fields(schemesLine[16:])
-		return validSchemes, nil
+		schemes := strings.Fields(schemesLine[16:])
+		return schemes, nil
 	}
 	return nil, errors.New("empty scheme slice, no encoding provided")
 }
