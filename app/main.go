@@ -29,7 +29,7 @@ func main() {
 func handleRequest(conn net.Conn) {
 	defer conn.Close()
 
-	supportedEncodingSchemes := []string{"gzip"}
+	//supportedEncodingSchemes := []string{"gzip"}
 
 	req := make([]byte, 1024)
 	conn.Read(req)
