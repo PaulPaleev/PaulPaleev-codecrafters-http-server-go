@@ -84,24 +84,28 @@ func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
-func filterValidSchemes(schemes []string) []string {
+func filterValidSchemes(schemes []string) ([]string, error) {
 	var validSchemes []string
 	for _, v := range schemes {
 		if slices.Contains(supportedEncodingSchemes, v) {
 			validSchemes = append(validSchemes, v)
 		}
 	}
-	return validSchemes
-}
-
-func getEncodingsList(request string) ([]string, error) {
-	schemesLine := strings.Split(request, "\r\n")[2]
-	if len(schemesLine) > 0 {
-		schemes := strings.Fields(schemesLine[16:])
-		validSchemes := filterValidSchemes(schemes)
+	if len(validSchemes) > 0 {
 		return validSchemes, nil
 	}
 	return nil, errors.New("empty scheme slice, no encoding provided")
+}
+
+func getEncodingsList(request string) ([]string, error) {
+	var schemesToReturn []string
+	var err error
+	schemesLine := strings.Split(request, "\r\n")[2]
+	if len(schemesLine) > 0 {
+		schemes := strings.Fields(schemesLine[16:])
+		schemesToReturn, err = filterValidSchemes(schemes)
+	}
+	return schemesToReturn, err
 }
 
 func getMethodType(request string) string {
