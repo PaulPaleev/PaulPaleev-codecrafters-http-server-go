@@ -31,6 +31,7 @@ func main() {
 	// 	return
 	// }
 	body := string(req)[10:]
+	body = body[:len(body)-9]
 	number := len(body)
 	fmt.Println(body)
 
