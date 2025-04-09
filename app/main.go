@@ -51,6 +51,7 @@ func handleRequest(conn net.Conn) {
 		if err == nil {
 			response += "Content-Encoding:" + schemes[0] + "\r\n"
 			compressedBody := getCompressedBody(body)
+			fmt.Println(compressedBody)
 			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", 23, compressedBody)
 		} else {
 			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
