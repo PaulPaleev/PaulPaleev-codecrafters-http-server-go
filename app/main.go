@@ -46,10 +46,10 @@ func handleRequest(conn net.Conn) {
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
-		filename := getFilename(strReq)
+		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
 		dir := os.Args[2]
+		filename := getFilename(strReq)
 		if getMethodType(strReq) == "GET" {
-			// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
 			body, err := os.ReadFile(dir + filename)
 			if err != nil {
 				sendNotFound(conn)
@@ -59,9 +59,6 @@ func handleRequest(conn net.Conn) {
 			conn.Write([]byte(finalStringToConvert))
 		} else if getMethodType(strReq) == "POST" {
 			body := getBody(strReq)
-			// file, _ := os.Create(dir + filename)
-			// file.WriteString(body)
-
 			err := os.WriteFile(dir+filename, []byte(body), 0666)
 			if err != nil {
 				sendNotFound(conn)
