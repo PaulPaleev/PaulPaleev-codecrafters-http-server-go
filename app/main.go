@@ -40,11 +40,14 @@ func handleRequest(conn net.Conn) {
 	if target == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
-
-		fmt.Println(getEncodingsList(strReq))
-
+		response := "HTTP/1.1 200 OK\r\n"
+		schemes := getEncodingsList(strReq)
+		if schemes[0] == "gzip" {
+			response += "Content-Encoding: gzip\r\n"
+		}
 		body := strings.Split(target, "/")[2]
-		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+		finalStringToConvert := fmt.Sprintf(response+"Content-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+		//finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/user-agent") {
 		body := getUserAgent(strReq)
@@ -83,9 +86,7 @@ func sendNotFound(conn net.Conn) {
 func getEncodingsList(request string) []string {
 	var validSchemes []string
 	schemesLine := strings.Split(request, "\r\n")[2]
-	fmt.Println("full line: ", schemesLine)
 	validSchemes = strings.Fields(schemesLine[16:])
-	fmt.Println("slice: ", validSchemes)
 	return validSchemes
 }
 
