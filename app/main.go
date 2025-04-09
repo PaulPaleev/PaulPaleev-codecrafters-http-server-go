@@ -45,8 +45,7 @@ func handleRequest(conn net.Conn) {
 		response := "HTTP/1.1 200 OK\r\n"
 		schemes, err := getEncodingsList(strReq)
 		if err == nil {
-			validSchemes := filterValidSchemes(schemes)
-			response += "Content-Encoding:" + validSchemes[0] + "\r\n"
+			response += "Content-Encoding:" + schemes[0] + "\r\n"
 		}
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf(response+"Content-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
@@ -92,7 +91,6 @@ func filterValidSchemes(schemes []string) []string {
 			validSchemes = append(validSchemes, v)
 		}
 	}
-	fmt.Println("eaasfa: ", validSchemes)
 	return validSchemes
 }
 
@@ -100,7 +98,8 @@ func getEncodingsList(request string) ([]string, error) {
 	schemesLine := strings.Split(request, "\r\n")[2]
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
-		return schemes, nil
+		validSchemes := filterValidSchemes(schemes)
+		return validSchemes, nil
 	}
 	return nil, errors.New("empty scheme slice, no encoding provided")
 }
