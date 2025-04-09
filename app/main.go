@@ -33,6 +33,8 @@ func handleRequest(conn net.Conn) {
 
 	target := getRequestTarget(string(req))
 
+	fmt.Println("TARGET: " + target)
+
 	if target == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
