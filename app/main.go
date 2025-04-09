@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
 	"net"
@@ -42,13 +44,17 @@ func handleRequest(conn net.Conn) {
 	if target == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
-		response := "HTTP/1.1 200 OK\r\n"
+		response := "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+		body := strings.Split(target, "/")[2]
+		var finalStringToConvert string
 		schemes, err := getEncodingsList(strReq)
 		if err == nil {
 			response += "Content-Encoding:" + schemes[0] + "\r\n"
+			compressedBody := getCompressedBody(body)
+			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", 23, compressedBody)
+		} else {
+			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
 		}
-		body := strings.Split(target, "/")[2]
-		finalStringToConvert := fmt.Sprintf(response+"Content-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/user-agent") {
 		body := getUserAgent(strReq)
@@ -84,6 +90,14 @@ func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 }
 
+func getCompressedBody(body string) *gzip.Writer {
+	var b bytes.Buffer
+	w := gzip.NewWriter(&b)
+	w.Write([]byte(body))
+	w.Close()
+	return w
+}
+
 func getEncodingsList(request string) ([]string, error) {
 	var schemesToReturn []string
 	schemesLine := strings.Split(request, "\r\n")[2]
@@ -98,7 +112,6 @@ func getEncodingsList(request string) ([]string, error) {
 		if len(schemesToReturn) > 0 {
 			return schemesToReturn, nil
 		}
-		fmt.Println("TO RETURN ", schemesToReturn)
 	}
 	return schemesToReturn, errors.New("empty scheme slice, no encoding provided")
 }
