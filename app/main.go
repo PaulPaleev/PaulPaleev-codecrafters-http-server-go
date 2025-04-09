@@ -48,7 +48,8 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
 		filename := getFilename(strReq)
-		body, err := os.ReadFile(filename)
+		dir := os.Args[2] // ????
+		body, err := os.ReadFile(dir + filename)
 		if err != nil {
 			sendNotFound(conn)
 			return
