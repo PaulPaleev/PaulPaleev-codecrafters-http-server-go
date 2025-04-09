@@ -23,13 +23,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	go handleRequest(conn)
+}
+
+func handleRequest(conn net.Conn) {
 	req := make([]byte, 1024)
 	conn.Read(req)
 
 	target := getRequestTarget(string(req))
 
 	if target == "/" {
-		go conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	} else if strings.HasPrefix(target, "/echo") {
 		body := strings.Split(target, "/")[2]
 		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
