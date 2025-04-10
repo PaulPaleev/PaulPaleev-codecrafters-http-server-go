@@ -38,13 +38,12 @@ func handleRequest(conn net.Conn) {
 	req := make([]byte, 1024)
 	conn.Read(req)
 	strReq := string(req)
-
 	target := getRequestTarget(strReq)
 
 	if target == "/" {
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+		sendOK(conn)
 	} else if strings.HasPrefix(target, "/echo") {
-		response := "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+		response := getOkResponseWithTP()
 		body := strings.Split(target, "/")[2]
 		var finalStringToConvert string
 		schemes, err := getEncodingsList(strReq)
@@ -58,7 +57,8 @@ func handleRequest(conn net.Conn) {
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/user-agent") {
 		body := getUserAgent(strReq)
-		finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+		response := getOkResponseWithTP()
+		finalStringToConvert := fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
 		conn.Write([]byte(finalStringToConvert))
 	} else if strings.HasPrefix(target, "/files/") {
 		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
@@ -70,7 +70,8 @@ func handleRequest(conn net.Conn) {
 				sendNotFound(conn)
 				return
 			}
-			finalStringToConvert := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", len(body), body)
+			response := getOkResponseWithOstream()
+			finalStringToConvert := fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
 			conn.Write([]byte(finalStringToConvert))
 		} else if getMethodType(strReq) == "POST" {
 			body := getBody(strReq)
@@ -79,7 +80,7 @@ func handleRequest(conn net.Conn) {
 				sendNotFound(conn)
 				return
 			}
-			conn.Write([]byte("HTTP/1.1 201 Created\r\n\r\n"))
+			sendCreated(conn)
 		}
 	} else {
 		sendNotFound(conn)
@@ -88,6 +89,22 @@ func handleRequest(conn net.Conn) {
 
 func sendNotFound(conn net.Conn) {
 	conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+}
+
+func getOkResponseWithTP() string {
+	return "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+}
+
+func getOkResponseWithOstream() string {
+	return "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\n"
+}
+
+func sendOK(conn net.Conn) {
+	conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+}
+
+func sendCreated(conn net.Conn) {
+	conn.Write([]byte("HTTP/1.1 201 Created\r\n\r\n"))
 }
 
 func getCompressedBody(body string) string {
