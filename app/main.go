@@ -47,9 +47,12 @@ func handleRequest(conn net.Conn) {
 	} else if strings.HasPrefix(target, "/user-agent") {
 		conn.Write([]byte(handleUAgentRequest(strReq)))
 	} else if strings.HasPrefix(target, "/files/") {
-		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
+		/*
+			os.Args provides access to raw command-line arguments
+			in this case /tmp/data/codecrafters.io/http-server-tester/
+			from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/ command
+		*/
 		dir := os.Args[2]
-		//filename := getFilename(strReq)
 		if getMethodType(strReq) == "GET" {
 			conn.Write([]byte(handleGetFileRequest(conn, strReq, dir)))
 		} else if getMethodType(strReq) == "POST" {
