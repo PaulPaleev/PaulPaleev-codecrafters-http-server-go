@@ -49,28 +49,38 @@ func handleRequest(conn net.Conn) {
 	} else if strings.HasPrefix(target, "/files/") {
 		// /tmp/data/codecrafters.io/http-server-tester/ from /tmp/codecrafters-build-http-server-go --directory /tmp/data/codecrafters.io/http-server-tester/
 		dir := os.Args[2]
-		filename := getFilename(strReq)
+		//filename := getFilename(strReq)
 		if getMethodType(strReq) == "GET" {
-			body, err := os.ReadFile(dir + filename)
-			if err != nil {
-				sendNotFound(conn)
-				return
-			}
-			response := getOkResponseWithOstream()
-			finalStringToConvert := fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
-			conn.Write([]byte(finalStringToConvert))
+			conn.Write([]byte(handleGetFileRequest(conn, strReq, dir)))
 		} else if getMethodType(strReq) == "POST" {
-			body := getBody(strReq)
-			err := os.WriteFile(dir+filename, []byte(body), 0666)
-			if err != nil {
-				sendNotFound(conn)
-				return
-			}
-			sendCreated(conn)
+			handlePostRequest(conn, strReq, dir)
 		}
 	} else {
 		sendNotFound(conn)
 	}
+}
+
+func handlePostRequest(conn net.Conn, strReq string, dir string) {
+	filename := getFilename(strReq)
+	body := getBody(strReq)
+	err := os.WriteFile(dir+filename, []byte(body), 0666)
+	if err != nil {
+		sendNotFound(conn)
+		return
+	}
+	sendCreated(conn)
+}
+
+func handleGetFileRequest(conn net.Conn, strReq string, dir string) string {
+	filename := getFilename(strReq)
+	body, err := os.ReadFile(dir + filename)
+	if err != nil {
+		sendNotFound(conn)
+		return ""
+	}
+	response := getOkResponseWithOstream()
+	finalStringToConvert := fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
+	return finalStringToConvert
 }
 
 func handleUAgentRequest(strReq string) string {
