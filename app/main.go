@@ -11,12 +11,6 @@ import (
 	"strings"
 )
 
-/*
-since we can not have a slice as const we need to use this solution
-there is no way we can get a mutated value
-*/
-var supportedEncodingSchemes = getSupportedSchemes()
-
 func main() {
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
@@ -147,6 +141,11 @@ func getCompressedBody(body string) string {
 
 func getEncodingsList(request string) ([]string, error) {
 	var schemesToReturn []string
+	/*
+		since we can not have a slice as const we need to use this solution
+		there is no way we can get a mutated value
+	*/
+	supportedEncodingSchemes := getSupportedSchemes()
 	schemesLine := strings.Split(request, "\r\n")[2]
 	if len(schemesLine) > 0 {
 		schemes := strings.Fields(schemesLine[16:])
