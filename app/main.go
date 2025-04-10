@@ -11,7 +11,11 @@ import (
 	"strings"
 )
 
-var supportedEncodingSchemes = []string{"gzip"}
+/*
+since we can not have a slice as const we need to use this solution
+there is no way we can get a mutated value
+*/
+var supportedEncodingSchemes = getSupportedSchemes()
 
 func main() {
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
@@ -61,6 +65,10 @@ func handleRequest(conn net.Conn) {
 	} else {
 		sendNotFound(conn)
 	}
+}
+
+func getSupportedSchemes() []string {
+	return []string{"gzip"}
 }
 
 func handlePostRequest(conn net.Conn, strReq string, dir string) {
