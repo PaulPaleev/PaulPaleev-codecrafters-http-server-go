@@ -43,18 +43,18 @@ func handleRequest(conn net.Conn) {
 	if target == "/" {
 		sendOK(conn)
 	} else if strings.HasPrefix(target, "/echo") {
-		response := getOkResponseWithTP()
-		body := strings.Split(target, "/")[2]
-		var finalStringToConvert string
-		schemes, err := getEncodingsList(strReq)
-		if err == nil {
-			response += "Content-Encoding:" + schemes[0] + "\r\n"
-			compressedBody := getCompressedBody(body)
-			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(compressedBody), compressedBody)
-		} else {
-			finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
-		}
-		conn.Write([]byte(finalStringToConvert))
+		// response := getOkResponseWithTP()
+		// body := strings.Split(target, "/")[2]
+		// var finalStringToConvert string
+		// schemes, err := getEncodingsList(strReq)
+		// if err == nil {
+		// 	response += "Content-Encoding:" + schemes[0] + "\r\n"
+		// 	compressedBody := getCompressedBody(body)
+		// 	finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(compressedBody), compressedBody)
+		// } else {
+		// 	finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
+		// }
+		conn.Write([]byte(handleEchoRequest(strReq, target)))
 	} else if strings.HasPrefix(target, "/user-agent") {
 		body := getUserAgent(strReq)
 		response := getOkResponseWithTP()
@@ -85,6 +85,21 @@ func handleRequest(conn net.Conn) {
 	} else {
 		sendNotFound(conn)
 	}
+}
+
+func handleEchoRequest(strReq string, target string) string {
+	response := getOkResponseWithTP()
+	body := strings.Split(target, "/")[2]
+	var finalStringToConvert string
+	schemes, err := getEncodingsList(strReq)
+	if err == nil {
+		response += "Content-Encoding:" + schemes[0] + "\r\n"
+		compressedBody := getCompressedBody(body)
+		finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(compressedBody), compressedBody)
+	} else {
+		finalStringToConvert = fmt.Sprintf(response+"Content-Length: %d\r\n\r\n%s", len(body), body)
+	}
+	return finalStringToConvert
 }
 
 func sendNotFound(conn net.Conn) {
